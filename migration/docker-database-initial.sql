@@ -1,4 +1,4 @@
-create table aluno(
+create table alunos(
     id serial primary key,
     nome varchar,
     cpf varchar,

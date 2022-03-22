@@ -1,8 +1,10 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
+	"api-go-gin/config"
 	"api-go-gin/controllers"
+
+	"github.com/gin-gonic/gin"
 )
 
 func HandleRequests() {
@@ -14,5 +16,10 @@ func HandleRequests() {
 	r.DELETE("/alunos/:id", controllers.DeletaAluno)
 	r.PATCH("/alunos/:id", controllers.EditaAluno)
 	r.GET("/alunos/cpf/:cpf", controllers.BuscaAlunoPorCPF)
-	r.Run(":8081")
+	
+	if(config.Settings.TestMode){
+		r.Run(":8082")
+	} else {
+		r.Run(":8081")
+	}
 }

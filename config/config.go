@@ -19,6 +19,7 @@ func DatabaseConnector() (string, string, string, string, string) {
 		log.Fatal("Error loading .env file")
 	}
 
+	
 	var dbName, hostName, port, user, password string
 	if Settings.TestMode {
 		dbName = os.Getenv("DB_NAME_TEST")

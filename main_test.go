@@ -40,6 +40,7 @@ func DeletaAlunoMock() {
 
 func setup() {
 	config.Settings.TestMode = true
+	database.Connect()
 }
 func teardown() {
 	fmt.Println("teardown()")
@@ -62,14 +63,14 @@ func TestVerificaStatusCodeDaSaudacaoComParametro(t *testing.T) {
 	r.ServeHTTP(resposta, req)
 	assert.Equal(t, http.StatusOK, resposta.Code, "Deveriam ser iguais")
 
-	mockDaResposta := `{"API diz":"Oi, henrique, tudo bem?"}`
+	mockDaResposta := `{"API diz:":"Oi, henrique, tudo bem?"}`
 	respostaBody, _ := ioutil.ReadAll(resposta.Body)
 	assert.Equal(t, mockDaResposta, string(respostaBody))
 }
 
 func TestListaTodosOsAlunosHandler(t *testing.T) {
 	r := SetupDasRotasDeTeste()
-	database.Connect()
+	
 
 	CriaAlunoMock()
 	defer DeletaAlunoMock()
@@ -83,7 +84,6 @@ func TestListaTodosOsAlunosHandler(t *testing.T) {
 
 func TestBuscaAlunoPorCpfHandler(t *testing.T) {
 	r := SetupDasRotasDeTeste()
-	database.Connect()
 
 	CriaAlunoMock()
 	defer DeletaAlunoMock()
@@ -96,7 +96,6 @@ func TestBuscaAlunoPorCpfHandler(t *testing.T) {
 }
 
 func TestBuscaAlunoPorIdHandler(t *testing.T) {
-	database.Connect()
 	r := SetupDasRotasDeTeste()
 
 	CriaAlunoMock()
@@ -118,7 +117,6 @@ func TestBuscaAlunoPorIdHandler(t *testing.T) {
 }
 
 func TestDeletaAlunoHandler(t *testing.T) {
-	database.Connect()
 	r := SetupDasRotasDeTeste()
 
 	CriaAlunoMock()
@@ -133,22 +131,21 @@ func TestDeletaAlunoHandler(t *testing.T) {
 
 func TestEditaUmAlunoHandler(t *testing.T) {
 	r := SetupDasRotasDeTeste()
-	database.Connect()
 
 	CriaAlunoMock()
 	defer DeletaAlunoMock()
 
 	r.PATCH("/alunos/:id", controllers.EditaAluno)
-	aluno := models.Aluno{Nome: "Aluno Teste", CPF: "47123456789", RG: "123456700"}
+	aluno := models.Aluno{Nome: "Nome do Aluno Teste", CPF: "47123456789", RG: "123456700"}
 	valorJson, _ := json.Marshal(aluno)
+
 	pathParaEditar := "/alunos/" + strconv.Itoa(ID)
 	req, _ := http.NewRequest("PATCH", pathParaEditar, bytes.NewBuffer(valorJson))
-
 	resposta := httptest.NewRecorder()
 	r.ServeHTTP(resposta, req)
 	var alunoMockAtualizado models.Aluno
 	json.Unmarshal(resposta.Body.Bytes(), &alunoMockAtualizado)
 	assert.Equal(t, "47123456789", alunoMockAtualizado.CPF)
 	assert.Equal(t, "123456700", alunoMockAtualizado.RG)
-	assert.Equal(t, "Aluno Teste", alunoMockAtualizado.Nome)
+	assert.Equal(t, "Nome do Aluno Teste", alunoMockAtualizado.Nome)
 }
